@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd"
+       default-autowire="byName">
+
+    <!--<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">-->
+    <!--<property name="locations">-->
+    <!--<list>-->
+    <!--<value>classpath:config/application-test.properties</value>-->
+    <!--</list>-->
+    <!--</property>-->
+    <!--<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"></property>-->
+    <!--</bean>-->
+
+    <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+        <property name="defaultErrorView" value="error/error"/>
+        <property name="exceptionMappings">
+            <props>
+                <prop key="com.jd.common.hrm.IllegalHrmPrivilegeException">error/access-denied</prop>
+            </props>
+        </property>
+    </bean>
+
+    <mvc:annotation-driven>
+        <mvc:path-matching suffix-pattern="false"/>
+    </mvc:annotation-driven>
+
+    <!-- static resources -->
+    <mvc:resources location="classpath:/static/" mapping="/resources/**" cache-period="86400"/>
+
+    <mvc:view-controller path="/" view-name="home"/>
+    <mvc:view-controller path="/error/access-denied" view-name="error/access-denied"/>
+
+   <!-- <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">-->
+        <!--<property name="basename" value="messages"/>-->
+        <!--<property name="useCodeAsDefaultMessage" value="true"/>-->
+    <!--</bean>-->
+
+
+
+
+    <bean id="velocityConfig" class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
+        <property name="resourceLoaderPath" value="classpath:/vm/"/>
+        <!--页面文件的路径,相对于webapp-->
+        <property name="velocityProperties">
+            <props>
+                <prop key="input.encoding">UTF-8</prop>
+                <!-- 指定模板引擎进行模板处理的编码 -->
+                <prop key="output.encoding">UTF-8</prop>
+                <!-- 指定输出流的编码 -->
+                <prop key="contentType">text/html;charset=UTF-8</prop>
+                <!-- contentType -->
+                <prop key="velocimacro.library">macro.vm</prop>
+                <!-- directive.set.null.allowed -->
+                <prop key="directive.set.null.allowed">true</prop>
+            </props>
+        </property>
+    </bean>
+
+
+    <bean id="viewResolver" name="viewResolver" class="com.jd.scf3.common.utils.VelocityBusinessLayoutViewResolver">
+        <property name="layoutUrl" value="layout/default.vm"/>
+        <!--指定vm默认布局模板-->
+        <property name="cache" value="false"/>
+        <!--是否缓存模板-->
+        <property name="suffix" value=".vm"/>
+        <!--页面后缀-->
+        <property name="exposeSpringMacroHelpers" value="true"/>
+        <!--是否使用spring对宏定义的支持-->
+        <property name="dateToolAttribute" value="dateTool"/>
+        <!--日期函数名称-->
+        <property name="numberToolAttribute" value="numberTool"/>
+        <!--数字函数名称-->
+        <!--<property name="attributesMap" ref="velocityTools"/>-->
+
+        <property name="contentType" value="text/html;charset=UTF-8"/>
+        <!--工具类函数名称-->
+        <property name="attributesMap" ref="velocityTools"/>
+    </bean>
+
+    <bean name="velocityTools" class="java.util.HashMap">
+        <constructor-arg>
+            <map>
+                <!-- 集合校验类 -->
+                <entry key="collectionUtils">
+                    <bean class="org.apache.commons.collections.CollectionUtils"/>
+                </entry>
+                <!-- 日期格式化类 -->
+
+                <!-- 通用的枚举helper -->
+                <entry key="EnumUtils">
+                    <bean class="com.jd.scf3.common.utils.EnumUtils">
+                        <property name="scanPackages" value="com.jd.rent.order.export.constants"/>
+                        <property name="checkDuplicate" value="true"/>
+                    </bean>
+                </entry>
+            </map>
+        </constructor-arg>
+    </bean>
+
+</beans>
